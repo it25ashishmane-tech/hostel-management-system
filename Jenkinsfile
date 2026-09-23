@@ -41,36 +41,38 @@ pipeline {
         }
 
         stage('Docker Check') {
-            steps {
-                bat '"%DOCKER_PATH%\\docker.exe" version'
-            }
-        }
+    steps {
+        bat '"C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" version'
+    }
+}
 
-        stage('Docker Build') {
-            steps {
-                 bat 'docker build -t ashishkc/hostel-management-system:latest .'
-            }
-        }
+stage('Docker Build') {
+    steps {
+        bat '"C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t ashishkc/hostel-management-system:latest .'
+    }
+}
 
-        stage('Docker Login') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'DOCKER_USERNAME',
-                        passwordVariable: 'DOCKER_PASSWORD'
-                    )
-                ]) {
-                    bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
-                }
-            }
+stage('Docker Login') {
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'dockerhub-credentials',
+                usernameVariable: 'DOCKER_USERNAME',
+                passwordVariable: 'DOCKER_PASSWORD'
+            )
+        ]) {
+            bat '''
+                echo %DOCKER_PASSWORD% | "C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" login -u "%DOCKER_USERNAME%" --password-stdin
+            '''
         }
+    }
+}
 
-        stage('Docker Push') {
-            steps {
-                bat 'docker push ashishkc/hostel-management-system:latest'
-            }
-        }
+stage('Docker Push') {
+    steps {
+        bat '"C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" push ashishkc/hostel-management-system:latest'
+    }
+}
     }
 
     post {
