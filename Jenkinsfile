@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_PATH = 'C:\\Program Files\\Docker\\Docker\\resources\\bin'
+        DOCKER_PATH = 'C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin'
         DOCKER_IMAGE = 'ashishkc/hostel-management-system:latest'
     }
 
