@@ -7,6 +7,11 @@ pipeline {
         maven 'Maven'
     }
 
+    environment {
+        DOCKER_PATH = 'C:\\Program Files\\Docker\\Docker\\resources\\bin'
+        DOCKER_IMAGE = 'ashishkc/hostel-management-system:latest'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -35,15 +40,20 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Check') {
             steps {
-                bat 'docker build -t ashishkc/hostel-management-system:latest .'
+                bat '"%DOCKER_PATH%\\docker.exe" version'
             }
         }
 
-        stage('Docker Push') {
+        stage('Docker Build') {
             steps {
+                bat '"%DOCKER_PATH%\\docker.exe" build -t %DOCKER_IMAGE% .'
+            }
+        }
 
+        stage('Docker Login') {
+            steps {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub-credentials',
@@ -51,11 +61,16 @@ pipeline {
                         passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
-
-                    bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
-
-                    bat 'docker push ashishkc/hostel-management-system:latest'
+                    bat '''
+                        echo %DOCKER_PASSWORD% | "%DOCKER_PATH%\\docker.exe" login -u "%DOCKER_USERNAME%" --password-stdin
+                    '''
                 }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                bat '"%DOCKER_PATH%\\docker.exe" push %DOCKER_IMAGE%'
             }
         }
     }
