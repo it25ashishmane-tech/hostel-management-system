@@ -25,7 +25,7 @@ pipeline {
         stage('Start Application') {
             steps {
                 bat 'start /B cmd /c "mvn exec:java > app.log 2>&1"'
-                bat 'timeout /t 10 /nobreak'
+                bat 'powershell -Command "Start-Sleep -Seconds 10"'
             }
         }
 
