@@ -48,7 +48,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                bat '"%DOCKER_PATH%\\docker.exe" build -t %DOCKER_IMAGE% .'
+                 bat 'docker build -t ashishkc/hostel-management-system:latest .'
             }
         }
 
@@ -57,20 +57,18 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'ashishkc',
-                        passwordVariable: 'ashish@25'
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
-                    bat '''
-                        echo %DOCKER_PASSWORD% | "%DOCKER_PATH%\\docker.exe" login -u "%DOCKER_USERNAME%" --password-stdin
-                    '''
+                    bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
                 }
             }
         }
 
         stage('Docker Push') {
             steps {
-                bat '"%DOCKER_PATH%\\docker.exe" push %DOCKER_IMAGE%'
+                bat 'docker push ashishkc/hostel-management-system:latest'
             }
         }
     }
