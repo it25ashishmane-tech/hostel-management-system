@@ -7,10 +7,6 @@ pipeline {
         maven 'Maven'
     }
 
-    environment {
-        DOCKER_IMAGE = 'ashishkc/hostel-management-system:latest'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -28,20 +24,8 @@ pipeline {
 
         stage('Start Application') {
             steps {
-                bat '''
-                    if exist app.log del /f /q app.log
-
-                    start "HostelManagementSystem" /B cmd /c "java -jar target\\hostel-management-system-1.0.jar > app.log 2>&1"
-
-                    for /L %%i in (1,1,30) do (
-                        netstat -ano | findstr ":8081" >nul
-                        if not errorlevel 1 exit /b 0
-                        timeout /t 2 /nobreak >nul
-                    )
-
-                    type app.log
-                    exit /b 1
-                '''
+                bat 'start /B cmd /c "mvn exec:java > app.log 2>&1"'
+                bat 'powershell -Command "Start-Sleep -Seconds 10"'
             }
         }
 
@@ -53,12 +37,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t %DOCKER_IMAGE% .'
+                bat 'docker build -t ashishkc/hostel-management-system:latest .'
             }
         }
 
         stage('Docker Push') {
             steps {
+
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub',
@@ -66,26 +51,32 @@ pipeline {
                         passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
+
                     bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
-                    bat 'docker push %DOCKER_IMAGE%'
+
+                    bat 'docker push ashishkc/hostel-management-system:latest'
                 }
             }
         }
     }
 
     post {
+
         always {
-            bat '''
-                for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8081"') do taskkill /F /PID %%a >nul 2>&1
+            powershell '''
+                $p = (Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue).OwningProcess
+                if ($p) {
+                    Stop-Process -Id $p -Force
+                }
             '''
         }
 
         success {
-            echo 'Pipeline completed successfully.'
+            echo 'Hostel Management System pipeline completed successfully!'
         }
 
         failure {
-            echo 'Pipeline failed.'
+            echo 'Hostel Management System pipeline failed!'
         }
     }
 }
