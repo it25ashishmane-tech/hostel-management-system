@@ -30,23 +30,17 @@ pipeline {
             steps {
                 bat '''
                     if exist app.log del /f /q app.log
-                    start "HostelManagementSystem" /B cmd /c "java -jar target\\hostel-management-system-1.0.jar > app.log 2>&1"
-                '''
 
-                bat '''
-                    powershell -NoProfile -Command ^
-                    "$started = $true; ^
-                    for ($i = 1; $i -le 30; $i++) { ^
-                        if (Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue) { ^
-                            $started = $true; ^
-                            break ^
-                        }; ^
-                        Start-Sleep -Seconds 2 ^
-                    }; ^
-                    if (-not $started) { ^
-                        if (Test-Path app.log) { Get-Content app.log }; ^
-                        exit 1 ^
-                    }"
+                    start "HostelManagementSystem" /B cmd /c "java -jar target\\hostel-management-system-1.0.jar > app.log 2>&1"
+
+                    for /L %%i in (1,1,30) do (
+                        netstat -ano | findstr ":8081" >nul
+                        if not errorlevel 1 exit /b 0
+                        timeout /t 2 /nobreak >nul
+                    )
+
+                    type app.log
+                    exit /b 1
                 '''
             }
         }
@@ -81,13 +75,8 @@ pipeline {
 
     post {
         always {
-            powershell '''
-                $connections = Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue
-                if ($connections) {
-                    $connections | ForEach-Object {
-                        Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue
-                    }
-                }
+            bat '''
+                for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8081"') do taskkill /F /PID %%a >nul 2>&1
             '''
         }
 
