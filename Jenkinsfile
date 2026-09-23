@@ -136,7 +136,7 @@ pipeline {
                 ]) {
                     bat '''
                         echo ==============================
-                         echo Docker Hub Login
+                        echo Docker Hub Login
                         echo ==============================
 
                         echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin
