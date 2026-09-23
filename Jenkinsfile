@@ -48,13 +48,13 @@ pipeline {
 
 stage('Docker Build') {
     steps {
-        bat '"C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t ashishkc/hostel-management-system:latest .'
+        bat 'docker build -t YOUR_DOCKERHUB_USERNAME/hostel-management-system:latest .'
     }
 }
 
 stage('Docker Push') {
     steps {
-        bat '"C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" push ashishkc/hostel-management-system:latest'
+        bat 'docker push YOUR_DOCKERHUB_USERNAME/hostel-management-system:latest'
     }
 }
     }
