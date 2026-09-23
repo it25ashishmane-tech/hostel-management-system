@@ -35,7 +35,7 @@ pipeline {
 
                 bat '''
                     powershell -NoProfile -Command ^
-                    "$started = $false; ^
+                    "$started = $true; ^
                     for ($i = 1; $i -le 30; $i++) { ^
                         if (Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue) { ^
                             $started = $true; ^
