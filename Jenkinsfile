@@ -52,11 +52,7 @@ stage('Docker Build') {
     }
 }
 
-stage('Docker Push') {
-    steps {
-        bat 'docker push ashishk/hostel-management-system:latest'
-    }
-}
+
     }
 
     post {
