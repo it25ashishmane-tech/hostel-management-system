@@ -52,34 +52,6 @@ stage('Docker Build') {
     }
 }
 
-stage('Docker Login') {
-    steps {
-        withCredentials([
-            usernamePassword(
-                credentialsId: 'dockerhub-credentials',
-                usernameVariable: 'DOCKER_USERNAME',
-                passwordVariable: 'DOCKER_PASSWORD'
-            )
-        ]) {
-            powershell '''
-                $docker = "C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
-
-                if (!(Test-Path $docker)) {
-                    throw "Docker executable not found: $docker"
-                }
-
-                $env:DOCKER_PASSWORD |
-                    & $docker login `
-                        --username $env:DOCKER_USERNAME `
-                        --password-stdin
-
-                if ($LASTEXITCODE -ne 0) {
-                    exit 1
-                }
-            '''
-        }
-    }
-}
 stage('Docker Push') {
     steps {
         bat '"C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" push ashishkc/hostel-management-system:latest'
