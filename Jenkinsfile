@@ -62,10 +62,13 @@ stage('Docker Login') {
             )
         ]) {
             powershell '''
+                $docker = (Get-Command docker.exe `
+                    -ErrorAction Stop).Source
+
                 $env:DOCKER_PASSWORD |
-                & "C:\\Users\\2560e\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" login `
-                    --username $env:DOCKER_USERNAME `
-                    --password-stdin
+                    & $docker login `
+                        --username $env:DOCKER_USERNAME `
+                        --password-stdin
 
                 if ($LASTEXITCODE -ne 0) {
                     exit 1
