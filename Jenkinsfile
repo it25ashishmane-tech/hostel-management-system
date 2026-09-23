@@ -62,8 +62,11 @@ stage('Docker Login') {
             )
         ]) {
             powershell '''
-                $docker = (Get-Command docker.exe `
-                    -ErrorAction Stop).Source
+                $docker = "C:\\Users\\25060\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+
+                if (!(Test-Path $docker)) {
+                    throw "Docker executable not found: $docker"
+                }
 
                 $env:DOCKER_PASSWORD |
                     & $docker login `
